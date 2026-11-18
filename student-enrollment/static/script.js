@@ -55,7 +55,71 @@ function validate(d) {
   return true;
 }
 
+const DB_NAME = "student-enrollment-db";
+const STORE_NAME = "students";
+
+function openBrowserDB() {
+  return new Promise((resolve, reject) => {
+    const request = indexedDB.open(DB_NAME, 1);
+    request.onupgradeneeded = () => {
+      request.result.createObjectStore(STORE_NAME, { keyPath: "roll_no" });
+    };
+    request.onsuccess = () => resolve(request.result);
+    request.onerror = () => reject(request.error);
+  });
+}
+
+async function browserDB(method, url, body) {
+  const db = await openBrowserDB();
+  const transaction = db.transaction(STORE_NAME, "readwrite");
+  const store = transaction.objectStore(STORE_NAME);
+
+  if (method === "GET") {
+    const rollNo = decodeURIComponent(url.split("/").pop());
+    const record = await new Promise((resolve, reject) => {
+      const request = store.get(rollNo);
+      request.onsuccess = () => resolve(request.result);
+      request.onerror = () => reject(request.error);
+    });
+    db.close();
+    return record ? { found: true, student: record } : { found: false };
+  }
+
+  if (method === "POST") {
+    const existing = await new Promise((resolve, reject) => {
+      const request = store.get(body.roll_no);
+      request.onsuccess = () => resolve(request.result);
+      request.onerror = () => reject(request.error);
+    });
+    if (existing) {
+      db.close();
+      throw new Error("Roll-No already exists.");
+    }
+    await new Promise((resolve, reject) => {
+      const request = store.add(body);
+      request.onsuccess = () => resolve();
+      request.onerror = () => reject(request.error);
+    });
+    db.close();
+    return { message: "Student saved successfully." };
+  }
+
+  if (method === "PUT") {
+    await new Promise((resolve, reject) => {
+      const request = store.put(body);
+      request.onsuccess = () => resolve();
+      request.onerror = () => reject(request.error);
+    });
+    db.close();
+    return { message: "Student updated successfully." };
+  }
+}
+
 async function api(url, method, body) {
+  if (location.hostname.endsWith("github.io") || location.protocol === "file:") {
+    return browserDB(method, url, body);
+  }
+
   const res = await fetch(url, {
     method,
     headers: { "Content-Type": "application/json" },
