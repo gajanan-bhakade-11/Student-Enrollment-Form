@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Student Enrollment Form</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <main class="card">
+    <h1>Student Enrollment Form</h1>
+    <p class="sub">SCHOOL-DB &rsaquo; STUDENT-TABLE</p>
+
+    <div id="msg" class="msg" role="status" aria-live="polite"></div>
+
+    <form id="studentForm" autocomplete="off" novalidate>
+      <label for="rollNo">Roll-No <span class="req">*</span></label>
+      <input type="text" id="rollNo" name="roll_no" placeholder="Enter Roll No and press Tab / Enter">
+
+      <label for="fullName">Full-Name <span class="req">*</span></label>
+      <input type="text" id="fullName" name="full_name">
+
+      <label for="class">Class <span class="req">*</span></label>
+      <input type="text" id="class" name="class" placeholder="e.g. 10-A">
+
+      <label for="birthDate">Birth-Date <span class="req">*</span></label>
+      <input type="date" id="birthDate" name="birth_date">
+
+      <label for="address">Address <span class="req">*</span></label>
+      <textarea id="address" name="address" rows="2"></textarea>
+
+      <label for="enrollmentDate">Enrollment-Date <span class="req">*</span></label>
+      <input type="date" id="enrollmentDate" name="enrollment_date">
+
+      <div class="buttons">
+        <button type="button" id="saveBtn" class="primary">Save</button>
+        <button type="button" id="updateBtn" class="primary">Update</button>
+        <button type="button" id="resetBtn" class="secondary">Reset</button>
+      </div>
+    </form>
+  </main>
+  <script src="script.js"></script>
+</body>
+</html>
